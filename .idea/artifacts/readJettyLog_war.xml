@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="readJettyLog:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="read-jettylog-1.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="readJettyLog:war exploded" />
+    </root>
+  </artifact>
+</component>

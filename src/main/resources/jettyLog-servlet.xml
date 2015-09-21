@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+       <bean id="dataSource" class="org.nutz.dao.impl.SimpleDataSource">
+              <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+              <property name="jdbcUrl" value="jdbc:mysql://10.1.51.61:3306/jettylog"/>
+              <property name="username" value="root"/>
+              <property name="password" value="123456"/>
+       </bean>
+       <bean id="nutzDao" class="org.nutz.dao.impl.NutDao">
+              <property name="dataSource" ref="dataSource"/>
+       </bean>
+</beans>
