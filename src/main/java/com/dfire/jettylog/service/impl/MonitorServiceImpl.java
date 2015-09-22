@@ -1,8 +1,10 @@
 package com.dfire.jettylog.service.impl;
 
+import com.dfire.jettylog.Constants;
 import com.dfire.jettylog.bean.DailyMonitor;
 import com.dfire.jettylog.bean.Monitor;
 import com.dfire.jettylog.bean.MonitorDetails;
+import com.dfire.jettylog.bean.StopWatchMDetail;
 import com.dfire.jettylog.dao.IMonitorDao;
 import com.dfire.jettylog.service.IMonitorService;
 import com.dfire.jettylog.utils.CombineString;
@@ -57,24 +59,40 @@ public class MonitorServiceImpl implements IMonitorService {
 
         monitorDate = date;
         dailyMonitorName = monitorName;
-        //如果是以日期开头，先判断list是否为空，为空添加到list，否则执行插入数据库操作，并清空list
-        if (null != tempString.trim() && !tempString.isEmpty()) {
-
-            if (combineString.recognizeStartWithData(tempString)) {
-                if (stringList.isEmpty()) {
-                    stringList.add(tempString);
-                } else {
-                    insertMonitor(stringList, monitorName);
-                    stringList.clear();
-                    stringList.add(tempString);
-                }
-            } else {
-                //如果不是以日期开头，添加到list
+        if (monitorName.equals(Constants.Task.WATCH_ORDER_PAY_MONITOR)) {
+            if (null != tempString.trim() && !tempString.isEmpty()) {
                 if (!tempString.startsWith("-----------------------------------------")
                         && !tempString.startsWith("ms     %     Task name")) {
                     stringList.add(tempString);
                 }
+            } else {
+                insertWatchOrderPayMonitor(stringList, monitorName);
+                stringList.clear();
             }
+        }
+        if (monitorName.equals(Constants.Task.STOP_WATCH_MONITOR)) {
+            insertStopWatchMonitor(tempString.trim(), monitorName);
+            stringList.clear();
+        }
+    }
+
+    private void insertStopWatchMonitor(String string, String monitorName) throws Exception {
+        if (string.isEmpty()) {
+            return;
+        } else {
+            String[] tempString = string.split(" \\{");
+            StopWatchMDetail stopWatchMonitor = new StopWatchMDetail();
+            String endTime = null;
+            for (String temp : tempString) {
+                if (combineString.recognizeStartWithData(temp.toString().trim())) {
+                    endTime = temp.toString().trim().substring(11, 19);
+                }else {
+                    stopWatchMonitor = combineSubordinateTableSW(temp.trim());
+                }
+                stopWatchMonitor.setMonitorName(monitorName);
+                stopWatchMonitor.setEndTime(endTime);
+            }
+            monitorDao.insertStopWatchMonitor(stopWatchMonitor);
         }
     }
 
@@ -85,7 +103,7 @@ public class MonitorServiceImpl implements IMonitorService {
      * @param monitorName
      * @throws Exception
      */
-    public void insertMonitor(List<String> stringList, String monitorName) throws Exception {
+    public void insertWatchOrderPayMonitor(List<String> stringList, String monitorName) throws Exception {
         //list不能为空
         List<MonitorDetails> monitorDetailsList = new LinkedList<MonitorDetails>();
         if (stringList.isEmpty()) {
@@ -99,7 +117,7 @@ public class MonitorServiceImpl implements IMonitorService {
                     monitor = combinePrimaryTable(tempString);
                 } else {
                     //解析子表
-                    monitorDetailsList.add(combineSubordinateTable(tempString));
+                    monitorDetailsList.add(combineSubordinateTableWOP(tempString));
                 }
                 childTask++;
             }
@@ -206,11 +224,11 @@ public class MonitorServiceImpl implements IMonitorService {
     }
 
     /**
-     * 组装从表实体
+     * 组装watch_order_pay从表实体
      *
      * @param tempString
      */
-    private MonitorDetails combineSubordinateTable(String tempString) {
+    private MonitorDetails combineSubordinateTableWOP(String tempString) {
 
         MonitorDetails monitorDetails = new MonitorDetails();
         StringBuffer stringBuffer = new StringBuffer();
@@ -223,9 +241,13 @@ public class MonitorServiceImpl implements IMonitorService {
                 if (null != stringBuffer.toString() && !stringBuffer.toString().isEmpty()) {
                     if (combineString.recognizeDate(stringBuffer.toString().trim())) {
                         monitorDetails.setRunDate(stringBuffer.toString().trim());
+                        stringBuffer.delete(0, stringBuffer.length());
+                        continue;
                     }
                     if (combineString.recognizeRunTime(stringBuffer.toString().trim())) {
                         monitorDetails.setRunTime(Integer.valueOf(stringBuffer.toString().trim()));
+                        stringBuffer.delete(0, stringBuffer.length());
+                        continue;
                     }
                     if (combineString.recognizeEndTime(stringBuffer.toString().trim())) {
                         monitorDetails.setEndTime(Time.valueOf(stringBuffer.toString().trim()));
@@ -235,6 +257,8 @@ public class MonitorServiceImpl implements IMonitorService {
                         if (null != newStr && !newStr.isEmpty()) {
                             monitorDetails.setTimePercent(newStr);
                         }
+                        stringBuffer.delete(0, stringBuffer.length());
+                        continue;
                     }
                     if (combineString.recognizeGetFunction(stringBuffer.toString().trim())) {
                         Map map = fetchAttribute(stringBuffer.toString().trim());
@@ -242,11 +266,55 @@ public class MonitorServiceImpl implements IMonitorService {
                             assert monitorDetails != null;
                             monitorDetails.setTaskName((String) map.get("taskName"));
                             monitorDetails.setTaskId((String) map.get("taskId"));
+                            stringBuffer.delete(0, stringBuffer.length());
+                            continue;
                         }
                     }
                     //如果没有一个匹配到
                     stringBuffer.delete(0, strLength);
                 }
+            }
+        }
+        return monitorDetails;
+    }
+
+
+    /**
+     * 组装stopwatch子表实体
+     *
+     * @param tempString
+     * @return
+     */
+    private StopWatchMDetail combineSubordinateTableSW(String tempString) {
+        StopWatchMDetail monitorDetails = new StopWatchMDetail();
+        String[] detailsList = tempString.trim().split(",");
+        StringBuffer strBuffer = new StringBuffer();
+        String[] childStr;
+        for (String detailStr : detailsList) {
+            if (detailStr.contains("pro_time")) {
+                childStr = detailStr.trim().split("\":");
+                monitorDetails.setProTime(Integer.parseInt(childStr[1].trim()));
+                strBuffer.delete(0, strBuffer.length());
+                continue;
+            }
+            if (detailStr.contains("opt_time")) {
+                childStr = detailStr.trim().split("\":\"");
+                strBuffer.append(childStr[1].trim());
+
+                monitorDetails.setRunDate(strBuffer.substring(0, 10).toString().trim());
+                monitorDetails.setOptTime(strBuffer.substring(strBuffer.length() - 10, strBuffer.length() - 1).toString().trim());
+                strBuffer.delete(0, strBuffer.length());
+                continue;
+            }
+
+            if (detailStr.contains("request_path")) {
+                childStr = detailStr.trim().split(":");
+                strBuffer.append(childStr[1].trim());
+                strBuffer.delete(0, 1);
+                strBuffer.delete(strBuffer.length() - 1, strBuffer.length());
+                monitorDetails.setRequestPath(strBuffer.toString().trim());
+                strBuffer.delete(0, strBuffer.length());
+                continue;
             }
         }
         return monitorDetails;
@@ -294,7 +362,12 @@ public class MonitorServiceImpl implements IMonitorService {
 
         try {
             //创建表
-            monitorDao.createTable(monitorName, date);
+            if (monitorName.equals(Constants.Task.STOP_WATCH_MONITOR)) {
+                monitorDao.createStopWatchTable(monitorName, date);
+            }
+            if (monitorName.equals(Constants.Task.WATCH_ORDER_PAY_MONITOR)) {
+                monitorDao.createWatchOrderPayTable(monitorName, date);
+            }
         } catch (Exception e) {
             throw new Exception(e);
         }
@@ -325,15 +398,13 @@ public class MonitorServiceImpl implements IMonitorService {
 
         try {
             dailyMonitor.setRunDate(monitorDate);
+            dailyMonitor.setSucceedTime(succeedTime);
+            dailyMonitor.setMonitorCount(monitorCount);
             dailyMonitor.setMonitorName(dailyMonitorName);
             dailyMonitor.setFirstFailedCount(firstFailedCount);
             dailyMonitor.setFirstFailedTime(firstFailedTime);
             dailyMonitor.setSecondFailedCount(secondFailedCount);
             dailyMonitor.setSecondFailedTime(secondFailedTime);
-            dailyMonitor.setSucceedTime(succeedTime);
-
-            dailyMonitor.setMonitorCount(monitorCount);
-
             if (monitorCount != 0) {
                 dailyMonitor.setSucceedPercent(String.valueOf(100 * (monitorCount - (firstFailedCount)) / monitorCount) + "%");
                 dailyMonitor.setSecondFailedPercent(String.valueOf((100 * secondFailedCount / monitorCount)) + "%");

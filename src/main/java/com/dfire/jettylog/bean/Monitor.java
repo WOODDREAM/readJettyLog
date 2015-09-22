@@ -1,5 +1,6 @@
 package com.dfire.jettylog.bean;
 
+import com.sun.istack.internal.NotNull;
 import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Id;
 import org.nutz.dao.entity.annotation.Many;
@@ -20,12 +21,16 @@ public class Monitor {
     @Id
     private int id;
     @Column("end_time")
+    @NotNull
     private String endTime;
     @Column("task_name")
+    @NotNull
     private String taskName;
     @Column("run_time")
+    @NotNull
     private int runTime;
     @Column("run_date")
+    @NotNull
     private String runDate;
     @Column("child_number")
     private int childNumber;
@@ -33,6 +38,7 @@ public class Monitor {
     @Column("average_time")
     private int averageTime;
     @Column("monitor_name")
+    @NotNull
     private String monitorName;
     @Many(target = MonitorDetails.class,field = "monitorId")
     private List<MonitorDetails> monitorDetailsList;

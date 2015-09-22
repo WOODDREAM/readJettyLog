@@ -18,7 +18,7 @@ public class CombineString {
     private final static String functionRegExp = "\\d{1,4}[:][g][e][t]w*";
     private final static String percentageRegExp = "\\d{1,3}[%]$";
     private final static String timeRegExp = "\\d{2}[:]\\d{2}[:]\\d{2}";
-    private final static String taskRegExp = "^[g][e][t] | ^[S][T][O][P]"; //匹配行的开始处
+    private final static String taskRegExp = "^[g][e][t]"; //匹配行的开始处
     private final static String startWithDatRegExp = "^\\d{4}[-]\\d{2}[-]\\d{2}";
     private final static String dataRegExp = "^\\d{4}[-]\\d{2}[-]\\d{2}$";//纯日期格式
 
@@ -40,10 +40,11 @@ public class CombineString {
 
     /**
      * 解析是否是以日期开头的字符串
+     *
      * @param str
      * @return
      */
-    public boolean recognizeStartWithData(String str){
+    public boolean recognizeStartWithData(String str) {
         Pattern pat = Pattern.compile(startWithDatRegExp);
         Matcher mat = pat.matcher(str);
         boolean rs = mat.find();
@@ -54,7 +55,7 @@ public class CombineString {
         return false;
     }
 
-    public boolean recognizeDate(String str){
+    public boolean recognizeDate(String str) {
         Pattern pat = Pattern.compile(dataRegExp);
         Matcher mat = pat.matcher(str);
         boolean rs = mat.find();
@@ -64,6 +65,7 @@ public class CombineString {
         }
         return false;
     }
+
     /**
      * 解析是否包含日期
      *
@@ -151,12 +153,13 @@ public class CombineString {
         return false;
     }
 
-    /***
+    /**
      * 解析任务名称
+     *
      * @param str
      * @return
      */
-    public boolean recognizeTask(String str){
+    public boolean recognizeTask(String str) {
         Pattern pat = Pattern.compile(taskRegExp);
         Matcher mat = pat.matcher(str);
         boolean rs = mat.find();

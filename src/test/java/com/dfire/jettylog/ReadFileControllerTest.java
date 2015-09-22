@@ -20,14 +20,13 @@ public class ReadFileControllerTest extends BaseControllerTest {
     }
 
     @Test
-    public void testReadFile(){
+    public void testReadFile() throws Exception {
         String s1 = "F:\\watch_order_pay_monitor.log.2015-09-10";
         String s2 = "F:\\watch_order_pay_monitor.log.2015-09-11";
         String s3 = "F:\\watch_order_pay_monitor.log.2015-09-12";
         String s4 = "F:\\watch_order_pay_monitor.log.2015-09-13";
         String s5 = "F:\\watch_order_pay_monitor.log.2015-09-14";
         String s6 = "F:\\watch_order_pay_monitor.log.2015-09-15";
-        String s = "F:\\111.txt";
         List<String> stringList = new LinkedList<String>();
 //        stringList.add(s);
         stringList.add(s1);
@@ -38,13 +37,17 @@ public class ReadFileControllerTest extends BaseControllerTest {
         stringList.add(s6);
 //
         for(String fileAdress : stringList){
-            readFileController.readLocalFile(fileAdress);
+            readFile.readLocalFile(fileAdress);
         }
     }
     @Test
     public void testStartWatchOrderPayLogTask(){
-        readFileController.startWatchOrderPayLogTask();
+        readFileController.startLogTask(Constants.Task.STOP_WATCH_MONITOR);
     }
 
+    @Test
+    public void testBatchTask(){
+        readFileController.startLogTask(Constants.Task.WATCH_ORDER_PAY_MONITOR);
+    }
 
 }

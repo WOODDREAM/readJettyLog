@@ -4,7 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
        <bean id="dataSource" class="org.nutz.dao.impl.SimpleDataSource">
               <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-              <property name="jdbcUrl" value="jdbc:mysql://10.1.51.61:3306/jettylog"/>
+              <property name="jdbcUrl" value="jdbc:mysql://10.1.50.8:3306/jettylog"/>
               <property name="username" value="root"/>
               <property name="password" value="123456"/>
        </bean>

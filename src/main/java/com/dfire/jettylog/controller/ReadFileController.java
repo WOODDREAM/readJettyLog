@@ -20,7 +20,7 @@ public class ReadFileController {
     @Autowired
     private ReadFile readFile;
 
-    private static int count = 0;
+    private static int count = 20;
 
     /**
      * 下载并读取日志文件
@@ -40,7 +40,7 @@ public class ReadFileController {
 //        char newLast = (char) ((char) lastInt - 1);
 //        dateBuffer.append(newLast);
         String localFileLocalPath = ReadFile.getFilePath(dateBuffer.toString(),monitorName);
-        String url = ReadFile.getFileUrl(dateBuffer.toString(),monitorName);
+        String url = ReadFile.getFileUrl("",monitorName);
         try {
             HttpUtil.downloadFile(localFileLocalPath, url);
             readFile.readLocalFile(localFileLocalPath);
@@ -59,25 +59,27 @@ public class ReadFileController {
         //批量操作年月
         String nowTime = Constants.Task.START_DATE;
         StringBuffer dateBuffer = new StringBuffer();
-        //添加"-",日志格式示例：2015-09-01
-        dateBuffer.append("-");
+        //执行当天的日志没有日期后缀，批量操作需要添加日期后缀
+        dateBuffer.append(nowTime).append("-");
         //任务数量
-        if (count <= Constants.Task.TASK_NUMBER) {
+        for (int i=0;i< Constants.Task.TASK_NUMBER;i++) {
             if(count <= 9){
                 //如果小于9，添加"0"，匹配标准日志格式
-                dateBuffer.append(nowTime).append("0");
+                dateBuffer.append("0");
             }
-            dateBuffer.append(nowTime).append(count);
+            dateBuffer.append(count);
             String localFileLocalPath = ReadFile.getFilePath(dateBuffer.toString(),monitorName);
-            String url = ReadFile.getFileUrl(dateBuffer.toString(),monitorName);
+            String url = ReadFile.getFileUrl("."+dateBuffer.toString(),monitorName);
             try {
                 HttpUtil.downloadFile(localFileLocalPath, url);
                 readFile.readLocalFile(localFileLocalPath);
                 count++;
+                dateBuffer.delete(dateBuffer.length()-2,dateBuffer.length());
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        System.out.println("sfvdfvbfdgbfghn");
     }
 
 

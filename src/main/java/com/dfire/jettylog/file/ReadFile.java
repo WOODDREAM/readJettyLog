@@ -79,20 +79,27 @@ public class ReadFile {
         try {
             reader = new BufferedReader(new FileReader(file));
             String tempString;
-            if (monitorName.equals(Constants.Task.STOP_WATCH_MONITOR)) {
-                //如果是stopwatch_monitor 分割String字符串为主串和子串
-                while ((tempString = reader.readLine()) != null) {
-                    String[] temStrList = tempString.split("\\{");
-                    for (String tempStr : temStrList) {
-                        monitorService.obtainString(tempStr, monitorName, date);
-                    }
-                }
-            } else {
-                while ((tempString = reader.readLine()) != null) {
-                    monitorService.obtainString(tempString, monitorName, date);
-                }
+            while ((tempString = reader.readLine()) != null) {
+                monitorService.obtainString(tempString, monitorName, date);
+            }
+            if (monitorName.equals(Constants.Task.WATCH_ORDER_PAY_MONITOR)) {
                 monitorService.insertDailyMonitor();
             }
+//            if (monitorName.equals(Constants.Task.STOP_WATCH_MONITOR)) {
+//                //如果是stopwatch_monitor 分割String字符串为主串和子串
+//                while ((tempString = reader.readLine()) != null) {
+//                    String[] temStrList = tempString.split(" \\{");
+//                    for (String tempStr : temStrList) {
+//                        monitorService.obtainString(tempStr, monitorName, date);
+//                    }
+//                }
+//            }
+//            if (monitorName.equals(Constants.Task.WATCH_ORDER_PAY_MONITOR)) {
+//                while ((tempString = reader.readLine()) != null) {
+//                    monitorService.obtainString(tempString, monitorName, date);
+//                }
+//                monitorService.insertDailyMonitor();
+//            }
             reader.close();
             return true;
         } catch (IOException e) {

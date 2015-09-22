@@ -1,5 +1,6 @@
 package com.dfire.jettylog.task;
 
+import com.dfire.jettylog.Constants;
 import com.dfire.jettylog.controller.ReadFileController;
 import com.dfire.jettylog.utils.HttpUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class ScheduleTask extends TimerTask {
             public void run() {
                 try {
                     System.out.println("scheduleTask start :++++++++++++++++");
-                    readFileController.startWatchOrderPayLogTask();
+                    readFileController.startLogTask(Constants.Task.STOP_WATCH_MONITOR);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -52,7 +53,8 @@ public class ScheduleTask extends TimerTask {
     public void run() {
         System.out.println("++++++++++++++++++++++++++++++++");
 //        readFileController.startWatchOrderPayLogTask();
-        readFileController.batchTaskForWatchOrderPay();
+//        readFileController.batchTask(Constants.Task.STOP_WATCH_MONITOR);
+//        readFileController.startLogTask(Constants.Task.WATCH_ORDER_PAY_MONITOR);
     }
 
 }

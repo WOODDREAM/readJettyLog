@@ -1,5 +1,6 @@
 package com.dfire.jettylog.bean;
 
+import com.sun.istack.internal.NotNull;
 import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Id;
 import org.nutz.dao.entity.annotation.PK;
@@ -18,6 +19,7 @@ public class DailyMonitor {
     @Column("monitor_name")
     private String monitorName;
     @Column("run_date")
+    @NotNull
     private String runDate;
     @Column("monitor_count")
     private int monitorCount;
@@ -189,7 +191,7 @@ public class DailyMonitor {
         this.secondFailedTime = secondFailedTime;
     }
 
-//    public List<Monitor> getMonitorList() {
+    //    public List<Monitor> getMonitorList() {
 //        return monitorList;
 //    }
 //

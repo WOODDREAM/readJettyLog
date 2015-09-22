@@ -1,5 +1,6 @@
 package com.dfire.jettylog.bean;
 
+import com.sun.istack.internal.NotNull;
 import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Id;
 import org.nutz.dao.entity.annotation.Table;
@@ -19,7 +20,8 @@ public class MonitorDetails {
     @Id
     private int id;
     @Column("task_name")
-    private  String taskName;
+    private String taskName;
+    @NotNull
     @Column("run_time")
     private int runTime;
     @Column("time_percent")
@@ -27,8 +29,10 @@ public class MonitorDetails {
     @Column("task_id")
     private String taskId;
     @Column("end_time")
+    @NotNull
     private Time endTime;
     @Column("run_data")
+    @NotNull
     private String runDate;
 
     @Column("monitor_id")

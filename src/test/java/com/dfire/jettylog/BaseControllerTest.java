@@ -1,6 +1,7 @@
 package com.dfire.jettylog;
 
 import com.dfire.jettylog.controller.ReadFileController;
+import com.dfire.jettylog.file.ReadFile;
 import com.dfire.jettylog.task.QuartzTask;
 import com.dfire.jettylog.task.ScheduleTask;
 import com.dfire.jettylog.utils.HttpUtil;
@@ -32,5 +33,7 @@ public class BaseControllerTest {
     HttpUtil httpUtil;
     @Autowired
     QuartzTask quartzTask;
+    @Autowired
+    ReadFile readFile;
 
 }
